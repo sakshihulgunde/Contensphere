@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ContentSphere | Terraform Infrastructure Project</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: #e8eefb;
+      background: #0b1020;
+      line-height: 1.6;
+    }
+    header {
+      padding: 24px 8%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #26314b;
+    }
+    .brand { font-size: 22px; font-weight: bold; }
+    .brand span { color: #65d6ad; }
+    .tag {
+      color: #65d6ad;
+      border: 1px solid #286d5a;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+    main { max-width: 1100px; margin: auto; padding: 65px 24px; }
+    .eyebrow { color: #65d6ad; text-transform: uppercase; letter-spacing: 2px; font-size: 12px; }
+    h1 { font-size: clamp(36px, 6vw, 58px); line-height: 1.1; margin: 18px 0; }
+    h1 span { color: #65d6ad; }
+    .intro { color: #b5c0d8; font-size: 18px; max-width: 720px; }
+    .button {
+      display: inline-block; margin-top: 20px; padding: 12px 20px;
+      background: #65d6ad; color: #09151a; text-decoration: none;
+      border-radius: 8px; font-weight: bold;
+    }
+    h2 { margin-top: 55px; font-size: 25px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-top: 22px; }
+    .card {
+      padding: 22px; background: #121b30; border: 1px solid #283653;
+      border-radius: 14px;
+    }
+    .icon { font-size: 28px; }
+    .card h3 { margin: 10px 0; }
+    .card p, .muted { color: #aab7d0; font-size: 14px; }
+    .status { border-left: 4px solid #65d6ad; margin-top: 32px; padding: 18px 20px; background: #121b30; border-radius: 8px; }
+    footer { border-top: 1px solid #26314b; padding: 24px; text-align: center; color: #9eabc4; font-size: 13px; }
+    a { color: #65d6ad; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">Content<span>Sphere</span></div>
+    <div class="tag">TERRAFORM • AWS</div>
+  </header>
+
+  <main>
+    <div class="eyebrow">Infrastructure as Code Project</div>
+    <h1>Build infrastructure.<br><span>Automate with code.</span></h1>
+    <p class="intro">
+      ContentSphere demonstrates how cloud infrastructure can be defined,
+      organized into reusable Terraform modules, and validated through
+      a GitHub Actions workflow.
+    </p>
+    <a class="button" href="#architecture">Explore the architecture ↓</a>
+
+    <h2 id="architecture">Infrastructure Architecture</h2>
+    <p class="muted">AWS components defined in this project's infrastructure code.</p>
+
+    <div class="grid">
+      <section class="card">
+        <div class="icon">🌐</div>
+        <h3>VPC & Networking</h3>
+        <p>Organizes cloud networking with a VPC, subnet, internet gateway and routing.</p>
+      </section>
+      <section class="card">
+        <div class="icon">🖥️</div>
+        <h3>EC2 Compute</h3>
+        <p>Defines a virtual machine configuration for hosting a web server.</p>
+      </section>
+      <section class="card">
+        <div class="icon">🔐</div>
+        <h3>Security Group</h3>
+        <p>Controls network access, with SSH access restricted by a configurable CIDR.</p>
+      </section>
+      <section class="card">
+        <div class="icon">🪣</div>
+        <h3>Amazon S3</h3>
+        <p>Defines storage with encryption, versioning and public-access blocking.</p>
+      </section>
+    </div>
+
+    <h2>Automation & Tooling</h2>
+    <div class="grid">
+      <section class="card">
+        <h3>Terraform</h3>
+        <p>Infrastructure definitions, reusable modules, formatting and validation.</p>
+      </section>
+      <section class="card">
+        <h3>Git & GitHub</h3>
+        <p>Version control and collaboration for infrastructure code.</p>
+      </section>
+      <section class="card">
+        <h3>GitHub Actions</h3>
+        <p>Automated checks for Terraform formatting and configuration validity.</p>
+      </section>
+      <section class="card">
+        <h3>Cloud Alternatives</h3>
+        <p>Includes example infrastructure approaches using AWS CloudFormation and CDK.</p>
+      </section>
+    </div>
+
+    <div class="status">
+      <strong>✓ Website is being served by Apache</strong>
+      <p class="muted">
+        This page is a live project showcase. The website's availability does not
+        confirm that the Terraform-defined AWS infrastructure has been deployed.
+      </p>
+    </div>
+  </main>
+
+  <footer>
+    ContentSphere · Infrastructure as Code Deployment and Automation using Terraform
+  </footer>
+</body>
+</html>
