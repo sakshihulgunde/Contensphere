@@ -3,11 +3,11 @@ resource "random_id" "bucket_suffix" {
 }
 
 resource "aws_s3_bucket" "assets" {
-  bucket = "${var.project_name}-assets-${random_id.bucket_suffix.hex}"
+  bucket = "${lower(var.project_name)}-assets-${random_id.bucket_suffix.hex}"
 
   tags = {
     Name    = "${var.project_name}-assets"
-    Purpose = "Static assets and Terraform demo storage"
+    Purpose = "ContentSphere Terraform demonstration"
   }
 }
 

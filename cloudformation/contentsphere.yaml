@@ -1,0 +1,152 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  ContentSphere sample infrastructure using AWS CloudFormation.
+  Creates a VPC, public subnet, internet gateway, route table,
+  security group, and an EC2 web server.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: ContentSphere
+    Description: Project name used for resource tags.
+
+  LatestAmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+
+  AllowedSshCidr:
+    Type: String
+    Default: 127.0.0.1/32
+    Description: Replace with your trusted public IP followed by /32 before deployment.
+
+Resources:
+  ContentSphereVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.20.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-VPC'
+
+  ContentSphereInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-IGW'
+
+  AttachInternetGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref ContentSphereVPC
+      InternetGatewayId: !Ref ContentSphereInternetGateway
+
+  ContentSpherePublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ContentSphereVPC
+      CidrBlock: 10.20.1.0/24
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-Public-Subnet'
+
+  ContentSphereRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref ContentSphereVPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-Public-Route-Table'
+
+  DefaultInternetRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachInternetGateway
+    Properties:
+      RouteTableId: !Ref ContentSphereRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref ContentSphereInternetGateway
+
+  PublicSubnetRouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref ContentSpherePublicSubnet
+      RouteTableId: !Ref ContentSphereRouteTable
+
+  ContentSphereSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP and restricted SSH for ContentSphere
+      VpcId: !Ref ContentSphereVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref AllowedSshCidr
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-Security-Group'
+
+  ContentSphereWebServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref LatestAmiId
+      InstanceType: t3.micro
+      SubnetId: !Ref ContentSpherePublicSubnet
+      SecurityGroupIds:
+        - !GetAtt ContentSphereSecurityGroup.GroupId
+      MetadataOptions:
+        HttpEndpoint: enabled
+        HttpTokens: required
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          dnf install -y httpd
+          systemctl enable --now httpd
+          cat > /var/www/html/index.html <<'HTML'
+          <!doctype html>
+          <html>
+          <head><title>ContentSphere</title></head>
+          <body>
+          <h1>ContentSphere</h1>
+          <p>Infrastructure Provisioned using CloudFormation</p>
+          </body>
+          </html>
+          HTML
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-Web-Server'
+        - Key: Project
+          Value: ContentSphere
+        - Key: ManagedBy
+          Value: CloudFormation
+
+Outputs:
+  VpcId:
+    Description: ContentSphere VPC ID
+    Value: !Ref ContentSphereVPC
+
+  PublicSubnetId:
+    Description: ContentSphere public subnet ID
+    Value: !Ref ContentSpherePublicSubnet
+
+  WebServerInstanceId:
+    Description: EC2 instance ID
+    Value: !Ref ContentSphereWebServer
+
+  WebServerPublicIp:
+    Description: Public IPv4 address of the web server
+    Value: !GetAtt ContentSphereWebServer.PublicIp
+
+  WebsiteUrl:
+    Description: HTTP URL for the ContentSphere website
+    Value: !Sub 'http://${ContentSphereWebServer.PublicDnsName}'

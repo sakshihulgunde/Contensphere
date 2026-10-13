@@ -1,13 +1,13 @@
 variable "aws_region" {
   description = "AWS region where resources will be created"
   type        = string
-  default     = "eu-central-1"
+  default     = "ap-south-1"
 }
 
 variable "project_name" {
   description = "Project name used to tag and prefix resources"
   type        = string
-  default     = "aws-terraform-starter"
+  default     = "ContentSphere"
 }
 
 variable "environment" {
@@ -42,5 +42,5 @@ variable "instance_type" {
 variable "allowed_ssh_cidr" {
   description = "CIDR block allowed to SSH into the EC2 instance. Default is intentionally restrictive — override via tfvars."
   type        = string
-  default     = "0.0.0.0/0"
+  default     = "127.0.0.1/32"
 }

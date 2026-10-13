@@ -1,203 +1,111 @@
-# AWS Terraform Starter — VPC + EC2 + S3
+# ContentSphere – Infrastructure as Code Deployment and Automation using Terraform
 
-![Terraform](https://img.shields.io/badge/Terraform-1.5+-7B42BC?style=flat&logo=terraform&logoColor=white)
-![AWS](https://img.shields.io/badge/AWS-Provider%205.x-FF9900?style=flat&logo=amazon-aws&logoColor=white)
-![CI](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF?style=flat&logo=github-actions&logoColor=white)
-![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)
+**Student:** Sakshi Hulgunde
+**Batch:** DRA-501
+**Environment:** Development
+**AWS Region:** Asia Pacific (Mumbai) — `ap-south-1`
 
-A clean, **learning-focused** starter for deploying a basic but complete **AWS environment** with **Terraform**. Designed to be readable, well-commented, and a real reference for anyone (myself included) learning Infrastructure-as-Code.
+## Project Overview
 
-It applies the same practices real DevOps teams rely on — version control, CI on every push, secure-by-default resources, consistent tagging — to a deliberately small, single-AZ footprint. It's a **reference and learning base, not a production blueprint**: for real workloads you'd add private subnets + NAT, remote state with locking, multi-AZ, and a load balancer (see [Next Steps](#next-steps--possible-extensions)).
+ContentSphere is an Infrastructure as Code (IaC) learning project that uses Terraform to define reusable AWS infrastructure components. The objective is to make infrastructure configuration organized, repeatable, maintainable, and version-controlled.
 
-> Clone it, run `terraform apply`, and you have a live VPC + web server + secure S3 bucket in ~2 minutes. If it saves you time, a ⭐ helps others find it.
+This repository is a customized learning project based on the [AWS Terraform Starter](https://github.com/egezamb/aws-terraform-starter). The original repository is credited as the starting point.
 
----
+## Objectives
 
-## What This Deploys
+- Define AWS infrastructure using Terraform.
+- Organize infrastructure into reusable modules.
+- Manage configuration through input variables and outputs.
+- Apply security practices to networking and storage.
+- Use GitHub for source control.
+- Automate Terraform formatting and validation using GitHub Actions.
 
-```
-                          Internet
-                              │
-                              ▼
-                  ┌───────────────────────┐
-                  │   Internet Gateway    │
-                  └───────────┬───────────┘
-                              │
-              ┌───────────────┴───────────────┐
-              │  VPC  (10.0.0.0/16)           │
-              │                               │
-              │   ┌───────────────────────┐   │
-              │   │ Public Subnet         │   │
-              │   │ (10.0.1.0/24)         │   │
-              │   │                       │   │
-              │   │   ┌───────────────┐   │   │
-              │   │   │ EC2 (t3.micro)│   │   │
-              │   │   │ Amazon Linux  │   │   │
-              │   │   │ + Apache      │   │   │
-              │   │   └───────────────┘   │   │
-              │   └───────────────────────┘   │
-              └───────────────────────────────┘
+## Architecture
 
-   ┌────────────────────────────────────────────────┐
-   │  S3 Bucket — Versioned, Encrypted, Private     │
-   └────────────────────────────────────────────────┘
-```
+The intended architecture includes:
 
-| Resource | What it does |
-|----------|--------------|
-| **VPC** | Custom VPC with DNS support enabled, `10.0.0.0/16` |
-| **Internet Gateway** | Provides internet access to the VPC |
-| **Public Subnet** | `10.0.1.0/24` in the first AZ, auto-assigns public IPs |
-| **Route Table** | Routes `0.0.0.0/0` traffic to the IGW |
-| **Security Group** | Allows HTTP (80) from anywhere, SSH (22) from configurable CIDR |
-| **EC2 Instance** | `t3.micro` (free-tier eligible) running Apache via `user_data`, IMDSv2 enforced |
-| **S3 Bucket** | Versioning enabled, AES-256 encryption, all public access blocked |
+- **VPC:** Isolated virtual network.
+- **Public subnet:** Subnet for the web server.
+- **Internet Gateway and route table:** Internet routing.
+- **Security group:** Controls permitted inbound and outbound traffic.
+- **EC2:** Amazon Linux web server running Apache.
+- **S3:** Storage bucket with versioning, encryption, and public-access blocking.
 
----
+## Terraform Modules
 
-## Why I Built This
+| Module | Purpose |
+|---|---|
+| `modules/vpc` | VPC, subnet, Internet Gateway, and routing |
+| `modules/security-group` | EC2 network security rules |
+| `modules/ec2` | EC2 instance and web-server configuration |
+| `modules/s3` | S3 bucket security and configuration |
 
-I am a 3rd-year Software Development student moving deeper into cloud and DevOps. I had already deployed AWS resources manually via the Console as a freelancer, but I wanted to learn **Terraform** properly — not just `terraform apply` from a tutorial, but writing structured code from scratch.
+The root `main.tf` connects these modules. `variables.tf` defines input settings, and `outputs.tf` exposes selected resource attributes.
 
-This repo is the result of that learning, made public so anyone else starting Terraform can clone, read, and run it.
+## Repository Structure
 
----
-
-## Tech Stack
-
-- **Terraform** `>= 1.5.0`
-- **AWS Provider** `~> 5.0` (Hashicorp official)
-- **GitHub Actions** for CI (fmt + validate on every push/PR)
-- **Amazon Linux 2023** (latest AMI auto-selected via `data` source)
-
----
-
-## Project Structure
-
-```
-aws-terraform-starter/
-├── providers.tf              # Terraform + AWS provider configuration
-├── variables.tf              # All input variables with descriptions and validation
-├── vpc.tf                    # VPC, IGW, subnet, route table
-├── ec2.tf                    # EC2 + security group + AMI lookup + user_data
-├── s3.tf                     # S3 bucket with versioning + encryption + access block
-├── outputs.tf                # Useful outputs (IPs, IDs, URLs)
-├── terraform.tfvars.example  # Example variables file (copy to terraform.tfvars)
-├── .gitignore                # Excludes state files, .terraform/, secrets
-└── .github/
-    └── workflows/
-        └── terraform.yml     # CI: fmt check + init + validate on every push
+```text
+.
+├── .github/workflows/terraform.yml
+├── main.tf
+├── variables.tf
+├── outputs.tf
+├── providers.tf
+├── terraform.tfvars.example
+├── modules/
+│   ├── vpc/
+│   ├── security-group/
+│   ├── ec2/
+│   └── s3/
+├── documentation/
+│   └── project-report.md
+├── screenshots/
+├── cloudformation/
+├── cdk/
+└── README.md
 ```
 
----
+## Prerequisites
 
-## Quick Start
+- Terraform CLI
+- AWS CLI
+- An AWS account with appropriately scoped permissions, if deploying
+- Git
 
-### Prerequisites
-- AWS account with programmatic credentials configured (`aws configure` or environment variables)
-- Terraform `>= 1.5` installed (`brew install terraform` on macOS)
+## Validate the Configuration
 
-### Deploy
+Run these commands from the project root:
 
 ```bash
-git clone https://github.com/egezamb/aws-terraform-starter.git
-cd aws-terraform-starter
-
-cp terraform.tfvars.example terraform.tfvars
-# Open terraform.tfvars and set `allowed_ssh_cidr` to your IP (e.g. "1.2.3.4/32")
-
 terraform init
+terraform fmt -recursive
+terraform validate
 terraform plan
-terraform apply
 ```
 
-After ~2 minutes, Terraform will output the EC2 public DNS. Open `http://<public-dns>` and you'll see the deployed web server.
+Review the plan and potential costs before deployment. Successful validation does not mean AWS resources have been created.
 
-### Destroy
+## Configuration and Security
 
-```bash
-terraform destroy
-```
+Copy `terraform.tfvars.example` to `terraform.tfvars` and update the values for your environment.
 
-Always destroy when done — even free-tier instances accumulate small charges after the 12-month limit.
-
----
+- Never commit AWS credentials, secrets, or Terraform state.
+- Restrict SSH access to a trusted IP address.
+- Keep S3 public-access blocking enabled.
+- Review resource costs before deployment.
+- Prefer temporary credentials or an appropriately scoped IAM role.
+- Review the Terraform plan before applying changes.
 
 ## CI/CD
 
-Every push and pull request triggers a GitHub Actions workflow that:
+The GitHub Actions workflow checks Terraform formatting, initializes the configuration without a remote backend, and validates the Terraform files.
 
-1. Runs `terraform fmt -check -recursive` (fails if code isn't formatted)
-2. Runs `terraform init -backend=false`
-3. Runs `terraform validate`
-4. Posts a summary comment on pull requests
+## Project Status
 
-This catches formatting and syntax issues before code lands in `main` — exactly the kind of guardrails real DevOps teams set up.
+The modular Terraform configuration has been initialized and validated locally. Actual AWS provisioning, website reachability, Elastic IP configuration, and remote state must be verified separately before being reported as completed.
 
-See [`.github/workflows/terraform.yml`](./.github/workflows/terraform.yml).
+**Project message:** Infrastructure Provisioned using Terraform
 
----
+## License and Attribution
 
-## Security Notes
-
-- **State files** (`*.tfstate`) and **`terraform.tfvars`** are gitignored — they can contain secrets and resource IDs.
-- **`allowed_ssh_cidr`** defaults to `0.0.0.0/0` so the example works out of the box, but you should always restrict this to your IP via `terraform.tfvars`.
-- **S3 bucket** has **all public access blocked**, **versioning enabled**, and **AES-256 server-side encryption** — secure-by-default.
-- **EC2 metadata service** is locked to **IMDSv2 only** to prevent SSRF attacks.
-
----
-
-## Cost Estimate
-
-Roughly **free** if you stay within the AWS Free Tier:
-- `t3.micro` EC2 — 750 hours/month free for 12 months
-- VPC / Subnet / IGW / Route Table — free
-- S3 bucket (empty) — free
-- Data transfer (light testing) — free under 1 GB out per month
-
-Run `terraform destroy` when you are done testing.
-
----
-
-## What This Project Demonstrates
-
-- Writing structured Terraform code (providers, variables, resources, outputs)
-- Using `data` sources to look up dynamic values (latest AMI, availability zones)
-- Resource tagging strategy via `default_tags`
-- Variable validation with `validation` blocks
-- Secure-by-default AWS configurations (IMDSv2, S3 public access block, encryption)
-- Setting up CI for IaC (fmt + init + validate in GitHub Actions)
-- Proper `.gitignore` hygiene for Terraform projects
-- `user_data` bootstrapping for EC2 instances
-
----
-
-## Next Steps / Possible Extensions
-
-- Add a private subnet + NAT Gateway
-- Add an RDS instance in the private subnet
-- Use Terraform modules to refactor (`modules/vpc`, `modules/ec2`)
-- Add remote state via S3 + DynamoDB locking
-- Add Application Load Balancer in front of the EC2 instance
-- Add CloudWatch logging and a basic dashboard
-
-These are exactly the kinds of extensions I want to build next as my Terraform skills mature.
-
----
-
-## Author
-
-**Ege Zambelli** — 3rd-year Software Development student at WSB Merito Wrocław, focusing on cloud engineering and DevOps.
-
-- GitHub: [@egezamb](https://github.com/egezamb)
-- Related projects:
-  - [calculator-pytest-cicd](https://github.com/egezamb/calculator-pytest-cicd) — Python + pytest + GitHub Actions CI/CD
-  - [git-cicd-project](https://github.com/egezamb/git-cicd-project) — Git workflows + automation
-  - [sbatools](https://github.com/egezamb/sbatools) — Git Flow + release automation
-  - [ege-portfolio-2025](https://github.com/egezamb/ege-portfolio-2025) — Personal portfolio (Next.js)
-
----
-
-## License
-
-MIT — see [LICENSE](./LICENSE) if present, otherwise free to use, modify, and learn from.
+The repository started from [egezamb/aws-terraform-starter](https://github.com/egezamb/aws-terraform-starter). Refer to the included LICENSE file and upstream repository for licensing terms.

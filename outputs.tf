@@ -1,39 +1,31 @@
 output "vpc_id" {
-  description = "ID of the created VPC"
-  value       = aws_vpc.main.id
+  value = module.vpc.vpc_id
 }
 
 output "public_subnet_id" {
-  description = "ID of the public subnet"
-  value       = aws_subnet.public.id
+  value = module.vpc.public_subnet_id
 }
 
 output "ec2_instance_id" {
-  description = "ID of the EC2 web server"
-  value       = aws_instance.web.id
+  value = module.ec2.instance_id
 }
 
 output "ec2_public_ip" {
-  description = "Public IP address of the EC2 instance"
-  value       = aws_instance.web.public_ip
+  value = module.ec2.public_ip
 }
 
 output "ec2_public_dns" {
-  description = "Public DNS of the EC2 instance"
-  value       = aws_instance.web.public_dns
+  value = module.ec2.public_dns
 }
 
 output "web_url" {
-  description = "URL to access the deployed web server"
-  value       = "http://${aws_instance.web.public_dns}"
+  value = "http://${module.ec2.public_dns}"
 }
 
 output "s3_bucket_name" {
-  description = "Name of the S3 bucket"
-  value       = aws_s3_bucket.assets.id
+  value = module.s3.bucket_name
 }
 
 output "s3_bucket_arn" {
-  description = "ARN of the S3 bucket"
-  value       = aws_s3_bucket.assets.arn
+  value = module.s3.bucket_arn
 }
